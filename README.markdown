@@ -3,7 +3,7 @@ Jump Next Long Line Plugin
 
 Vim script to jump to the next line that exceeds the `&textwidth` option.
 
-Author: Caio Romão <caioromao@gmail.com>
+Author: `Caio Romão <caioromao@gmail.com>`
 
 ### License
 
@@ -21,4 +21,6 @@ will.
 I request that you acknowledge my authorship.
 
 Digital versions of the work may be available at
-http://github.com/caio/jumpnextlongline.vim/. Learn more at pleasepirate.org.
+[http://github.com/caio/jumpnextlongline.vim][homepage]. Learn more at pleasepirate.org.
+
+[homepage]: http://github.com/caio/jumpnextlongline.vim
