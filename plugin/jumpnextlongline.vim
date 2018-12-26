@@ -2,7 +2,7 @@
 " ===================
 "
 " Vim plugin to jump to the next line that exceed the textwidth setting
-" Last Change: 2010 Dec 24
+" Last Change: 2018 Dec 26
 " Maintainer: Caio Romão <caioromao@gmail.com>
 " License: This file is placed in the public domain
 "
@@ -28,49 +28,42 @@ noremap <unique> <script> <Plug>JumpNextLongLine :call <SID>JumpNext()<CR>
 
 function! s:JumpNext()
     let nline = s:NextLongLine()
-    execute "normal! " . nline . "gg"
+    if nline > 0
+        execute "normal! " . nline . "gg"
+    endif
 endfunction
 
-function! s:ListLongLines()
+function! s:IsLineTooLong(lineNr)
     let treshold = (&tw ? &tw : 80)
     let spaces = repeat(" ", &ts)
-    let longlines = []
 
-    let i = 1
-    while i <= line("$")
-        " Respect user's &ts setting
-        let len = strlen(substitute(getline(i), '\t', spaces, 'g'))
-        if len > treshold
-            call add(longlines, i)
-        endif
-        let i += 1
-    endwhile
-
-    return longlines
+    let len = strlen(substitute(getline(a:lineNr), '\t', spaces, 'g'))
+    if len > treshold
+        return 1
+    endif
 endfunction
 
 function! s:NextLongLine()
-    if !exists("b:long_lines_list")
-        let b:long_lines_list = s:ListLongLines()
-    endif
-
     let curline = line('.')
-    let listsize = len(b:long_lines_list)
+    let lastline = line('$')
 
-    let i = 0
-    while i < listsize
-        let nextline = get(b:long_lines_list, i)
-        if nextline > curline
-            return nextline
+    let i = curline + 1
+    " Scan to the end of the file
+    while i <= lastline
+        if s:IsLineTooLong(i)
+            return i
         endif
         let i += 1
     endwhile
-    " allow wrapping to the beginning of the buffer
-    return get(b:long_lines_list, 0, curline)
+    " Nothing found: scan from the beginning
+    let i = 1
+    while i <= curline
+        if s:IsLineTooLong(i)
+            return i
+        endif
+        let i += 1
+    endwhile
+    return 0
 endfunction
-
-" Delete list of long lines when idle and when writing
-" to trigger it's re-creation
-autocmd cursorhold,bufwritepost * unlet! b:long_lines_list
 
 let &cpo = s:save_cpo
